@@ -6,7 +6,8 @@ name: Go
 on:
   push:
     branches: 
-      - '!branch-1'
+      - '**'        # matches every branch
+      - '!main' 
 
 jobs:
 
