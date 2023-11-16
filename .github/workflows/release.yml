@@ -24,8 +24,9 @@ jobs:
           draft: true
           prerelease: true
 
-  build_software:
+  build:
     name: Create Release
+    needs: once
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
