@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, ubuntu-latest]
+        os: [macOS-latest, ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout code
@@ -40,28 +40,37 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      - if: needs.once.result.strategy == 'macOS-latest'
+      - if: needs.once.result.strategy == 'ubuntu-latest' || needs.once.result.strategy == 'macOS-latest'
         name: Build
-        run: go build -v -o macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
-      - if: needs.once.result.strategy == 'ubuntu-latest'
+        run: go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
+      - if: needs.once.result.strategy == 'windows-latest'
         name: Build
-        run: go build -v -o ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
+        run: go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
       - name: Test
         run: go test -v ./...
-      - if: needs.once.result.strategy == 'ubuntu-latest'
-        name: create zip
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-          dest: ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
-      - if: needs.once.result.strategy == 'macos-latest'
+      - if: needs.once.result.strategy == 'windows-latest'
         name: create zip
         uses: vimtor/action-zip@v1.1
         with:
           files: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
           dest: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - if: needs.once.result.strategy == 'ubuntu-latest' || needs.once.result.strategy == 'macOS-latest'
+        name: create-archive
+        run: tar -czf macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+      - if: needs.once.result.strategy == 'ubuntu-latest' || needs.once.result.strategy == 'macOS-latest'
+        name: Upload Release Asset
+        id: upload-release-asset_linuxmacos
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.once.outputs.upload_url }}
+          asset_path: ./helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
+          asset_name: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/zip
+      - if: needs.once.result.strategy == 'windows-latest'
+        name: Upload Release Asset
+        id: upload-release-asset_windows
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
