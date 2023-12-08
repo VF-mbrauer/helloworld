@@ -68,7 +68,7 @@ jobs:
           asset_path: ./helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
           asset_name: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/zip
-      - if: needs.once.result.strategy == 'windows-latest'
+      - if: matrix.os == 'windows-latest'
         name: Upload Release Asset
         id: upload-release-asset_windows
         uses: actions/upload-release-asset@v1
