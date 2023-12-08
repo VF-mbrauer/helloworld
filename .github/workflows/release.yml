@@ -48,11 +48,18 @@ jobs:
         run: go build -v -o ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
       - name: Test
         run: go test -v ./...
-      - name: create zip
+      - if: needs.once.result.strategy == 'ubuntu-latest'
+        name: create zip
         uses: vimtor/action-zip@v1.1
         with:
-          files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-          dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
+          files: ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+          dest: ubuntu-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
+      - if: needs.once.result.strategy == 'macos-latest'
+        name: create zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+          dest: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
       - name: Upload Release Asset
         id: upload-release-asset
         uses: actions/upload-release-asset@v1
