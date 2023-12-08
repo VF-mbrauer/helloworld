@@ -52,11 +52,11 @@ jobs:
         name: create zip
         uses: vimtor/action-zip@v1.1
         with:
-          files: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-          dest: macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
+          files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+          dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
       - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         name: create-archive
-        run: tar -czf macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz macos-helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+        run: tar -czf helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
       - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
         name: Upload Release Asset
         id: upload-release-asset_linuxmacos
