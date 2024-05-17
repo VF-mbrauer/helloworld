@@ -81,3 +81,14 @@ jobs:
           asset_path: ./helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
           asset_name: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
           asset_content_type: application/zip
+      - if: matrix.os == 'windows-latest'
+        name: Upload Release Asset only executable for winget
+        id: upload-release-asset_windows_exe
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.once.outputs.upload_url }}
+          asset_path: ./helloworld.exe
+          asset_name: helloworld.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
