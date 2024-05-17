@@ -50,12 +50,12 @@ jobs:
         run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./..."  
       - name: Test
         run: go test -v ./...
-      # - if: matrix.os == 'windows-latest'
-      #   name: create zip
-      #   uses: vimtor/action-zip@v1.1
-      #   with:
-      #     files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-      #     dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
+      - if: matrix.os == 'windows-latest'
+        name: create zip
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+          dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
       - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
         name: create-archive
         run: tar -czf helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
