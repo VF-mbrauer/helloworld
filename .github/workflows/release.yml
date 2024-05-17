@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [macos-13, ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout code
@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
         name: Build
         run: go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
       - if: matrix.os == 'windows-latest'
@@ -56,10 +56,10 @@ jobs:
         with:
           files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
           dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
         name: create-archive
         run: tar -czf helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'
+      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
         name: Upload Release Asset
         id: upload-release-asset_linuxmacos
         uses: actions/upload-release-asset@v1
