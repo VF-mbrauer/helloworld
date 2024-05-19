@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-13, ubuntu-latest, windows-latest]
+        os: [macos-latest, macos-13, ubuntu-latest, windows-latest]
 
     steps:
       - name: Checkout code
@@ -93,7 +93,7 @@ jobs:
           asset_path: ./helloworld-macos-amd64-${{ github.ref_name }}.tar.gz
           asset_name: helloworld-macos-amd64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/zip
-      - if: matrix.os == 'macos-14'
+      - if: matrix.os == 'macos-latest'
         name: Upload Release Asset
         id: upload-release-asset_macos_arm64
         uses: actions/upload-release-asset@v1
