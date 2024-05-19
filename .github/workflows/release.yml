@@ -42,50 +42,67 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.22'
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
+      - if: matrix.os == 'ubuntu-latest'
         name: Build
-        run: go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./...
-      - if: matrix.os == 'macos-14'
+        run: go build -v -o helloworld-linux-amd64-${{ github.ref_name }} ./...
+      - if: matrix.os == 'macos-13'
         name: Build
-        run: go build -v -o helloworld-${{ matrix.os }}-arm64-${{ github.ref_name }} ./...
+        run: go build -v -o helloworld-macos-amd64-${{ github.ref_name }} ./...
+      - if: matrix.os == 'macos-latest'
+        name: Build
+        run: go build -v -o helloworld-macos-arm64-${{ github.ref_name }} ./...
       - if: matrix.os == 'windows-latest'
         name: Build
-        run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }} ./..."  
+        run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-windows-amd64-${{ github.ref_name }} ./..."  
       - name: Test
         run: go test -v ./...
       - if: matrix.os == 'windows-latest'
-        name: create zip
+        name: create archive windows x86_x64
         uses: vimtor/action-zip@v1.1
         with:
-          files: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-          dest: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
-        name: create-archive
-        run: tar -czf helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
-      - if: matrix.os == 'macos-14'
-        name: create-archive
-        run: tar -czf helloworld-${{ matrix.os }}-arm64-${{ github.ref_name }}.tar.gz helloworld-${{ matrix.os }}-arm64-${{ github.ref_name }}
-      - if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-13'
+          files: helloworld-windows-amd64-${{ github.ref_name }}
+          dest: helloworld-windows-amd64-${{ github.ref_name }}.zip
+      - if: matrix.os == 'ubuntu-latest'
+        name: create-archive linux x86_x64
+        run: tar -czf helloworld-linux-amd64-${{ github.ref_name }}.tar.gz helloworld-linux-amd64-${{ github.ref_name }}
+      - if: matrix.os == 'macos-13'
+        name: create-archive macos x86_x64
+        run: tar -czf helloworld-macos-amd64-${{ github.ref_name }}.tar.gz helloworld-macos-amd64-${{ github.ref_name }}
+      - if: matrix.os == 'macos-latest'
+        name: create-archive macos arm64
+        run: tar -czf helloworld-macos-arm64-${{ github.ref_name }}.tar.gz helloworld-macos-arm64-${{ github.ref_name }}
+      - if: matrix.os == 'ubuntu-latest'
         name: Upload Release Asset
-        id: upload-release-asset_linuxmacos
+        id: upload-release-asset_linux
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.once.outputs.upload_url }}
-          asset_path: ./helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
-          asset_name: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.tar.gz
+          asset_path: ./helloworld-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_name: helloworld-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/zip
+      - if: matrix.os == 'macos-13'
+        name: Upload Release Asset
+        id: upload-release-asset_macos_x86-x64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.once.outputs.upload_url }}
+          asset_path: ./helloworld-macos-amd64-${{ github.ref_name }}.tar.gz
+          asset_name: helloworld-macos-amd64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/zip
       - if: matrix.os == 'macos-14'
         name: Upload Release Asset
-        id: upload-release-asset_macos-arm64
+        id: upload-release-asset_macos_arm64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.once.outputs.upload_url }}
-          asset_path: ./helloworld-${{ matrix.os }}-arm64-${{ github.ref_name }}.tar.gz
-          asset_name: helloworld-${{ matrix.os }}-arm64-${{ github.ref_name }}.tar.gz
+          asset_path: ./helloworld-macos-arm64-${{ github.ref_name }}.tar.gz
+          asset_name: helloworld-macos-arm64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/zip
       - if: matrix.os == 'windows-latest'
         name: Upload Release Asset
@@ -95,8 +112,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.once.outputs.upload_url }}
-          asset_path: ./helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
-          asset_name: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}.zip
+          asset_path: ./helloworld-windows-amd64-${{ github.ref_name }}.zip
+          asset_name: helloworld-windows-amd64-${{ github.ref_name }}.zip
           asset_content_type: application/zip
       - if: matrix.os == 'windows-latest'
         name: Upload Release Asset only executable for winget
@@ -106,6 +123,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.once.outputs.upload_url }}
-          asset_path: helloworld-${{ matrix.os }}-amd64-${{ github.ref_name }}
+          asset_path: helloworld-windows-amd64-${{ github.ref_name }}
           asset_name: helloworld.exe
           asset_content_type: application/vnd.microsoft.portable-executable
