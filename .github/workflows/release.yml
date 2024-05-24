@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, macos-13, ubuntu-latest, windows-latest]
+        os: [macos-latest, macos-13, ubuntu-latest, windows-latest, self-hosted]
 
     steps:
       - name: Checkout code
@@ -45,6 +45,9 @@ jobs:
       - if: matrix.os == 'ubuntu-latest'
         name: Build
         run: go build -v -o helloworld-linux-amd64-${{ github.ref_name }} ./...
+      - if: matrix.os == 'self-hosted'
+        name: Build
+        run: go build -v -o helloworld-linux-arm64-${{ github.ref_name }} ./...
       - if: matrix.os == 'macos-13'
         name: Build
         run: go build -v -o helloworld-macos-amd64-${{ github.ref_name }} ./...
@@ -65,6 +68,9 @@ jobs:
       - if: matrix.os == 'ubuntu-latest'
         name: create-archive linux x86_x64
         run: tar -czf helloworld-linux-amd64-${{ github.ref_name }}.tar.gz helloworld-linux-amd64-${{ github.ref_name }}
+      - if: matrix.os == 'self-hosted'
+        name: create-archive linux arm64
+        run: tar -czf helloworld-linux-arm64-${{ github.ref_name }}.tar.gz helloworld-linux-arm64-${{ github.ref_name }}
       - if: matrix.os == 'macos-13'
         name: create-archive macos x86_x64
         run: tar -czf helloworld-macos-amd64-${{ github.ref_name }}.tar.gz helloworld-macos-amd64-${{ github.ref_name }}
@@ -81,6 +87,17 @@ jobs:
           upload_url: ${{ needs.once.outputs.upload_url }}
           asset_path: ./helloworld-linux-amd64-${{ github.ref_name }}.tar.gz
           asset_name: helloworld-linux-amd64-${{ github.ref_name }}.tar.gz
+          asset_content_type: application/zip
+      - if: matrix.os == 'self-hosted'
+        name: Upload Release Asset
+        id: upload-release-asset_linux_arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.once.outputs.upload_url }}
+          asset_path: ./helloworld-linux-arm64-${{ github.ref_name }}.tar.gz
+          asset_name: helloworld-linux-arm64-${{ github.ref_name }}.tar.gz
           asset_content_type: application/zip
       - if: matrix.os == 'macos-13'
         name: Upload Release Asset
