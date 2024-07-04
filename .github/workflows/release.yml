@@ -58,7 +58,7 @@ jobs:
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
         run: |
           go build -v -o helloworld-macos-arm64-${{ github.ref_name }} ./...
-          echo $MACOS_CERTIFICATE | base64 -—decode > certificate.p12
+          echo $MACOS_CERTIFICATE | base64 -d > certificate.p12
           security create-keychain -p hello build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p hello build.keychain
