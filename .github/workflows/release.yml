@@ -66,12 +66,12 @@ jobs:
           security import certificate.p12 -k build.keychain -P $MACOS_CERTIFICATE_PWD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k hello build.keychain
           /usr/bin/codesign --force -s 42CB2B159BE90F2AA94CB336BDB5E24145125D9F ./helloworld-macos-arm64-${{ github.ref_name }} -v
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
         name: Build
         run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-windows-amd64-${{ github.ref_name }} ./..."  
       - name: Test
         run: go test -v ./...
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
         name: create archive windows x86_x64
         uses: vimtor/action-zip@v1.1
         with:
@@ -155,7 +155,7 @@ jobs:
           asset_path: ./helloworld-windows-arm64-${{ github.ref_name }}.zip
           asset_name: helloworld-windows-arm64-${{ github.ref_name }}.zip
           asset_content_type: application/zip
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-latest'|| matrix.arch == 'amd64'
         name: Upload Release Asset only executable for winget
         id: upload-release-asset_windows_exe
         uses: actions/upload-release-asset@v1
