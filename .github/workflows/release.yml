@@ -34,7 +34,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest]
-        arch: [amd64,arm64]
+        arch: [amd64]
 
     steps:
       - name: Checkout code
@@ -46,9 +46,6 @@ jobs:
       - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
         name: Build
         run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-windows-amd64-${{ github.ref_name }} ./..."  
-      - if: matrix.os == 'windows-latest' || matrix.arch == 'arm64'
-        name: Build
-        run: cmd /C "set CGO_ENABLED=0 && go build -v -o helloworld-windows-arm64-${{ github.ref_name }} ./..."  
       - name: Test
         run: go test -v ./...
       - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
@@ -57,12 +54,6 @@ jobs:
         with:
           files: helloworld-windows-amd64-${{ github.ref_name }}
           dest: helloworld-windows-amd64-${{ github.ref_name }}.zip
-      - if: matrix.os == 'windows-latest' || matrix.arch == 'arm64'
-        name: create archive windows arm64
-        uses: vimtor/action-zip@v1.1
-        with:
-          files: helloworld-windows-arm64-${{ github.ref_name }}
-          dest: helloworld-windows-arm64-${{ github.ref_name }}.zip
       - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
         name: Upload Release Asset for amd64
         id: upload-release-asset_windows_amd64
@@ -73,17 +64,6 @@ jobs:
           upload_url: ${{ needs.once.outputs.upload_url }}
           asset_path: ./helloworld-windows-amd64-${{ github.ref_name }}.zip
           asset_name: helloworld-windows-amd64-${{ github.ref_name }}.zip
-          asset_content_type: application/zip
-      - if: matrix.os == 'windows-latest' || matrix.arch == 'arm64'
-        name: Upload Release Asset for arm64
-        id: upload-release-asset_windows_arm64
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.once.outputs.upload_url }}
-          asset_path: ./helloworld-windows-arm64-${{ github.ref_name }}.zip
-          asset_name: helloworld-windows-arm64-${{ github.ref_name }}.zip
           asset_content_type: application/zip
       - if: matrix.os == 'windows-latest'|| matrix.arch == 'amd64'
         name: Upload Release Asset only executable for winget
