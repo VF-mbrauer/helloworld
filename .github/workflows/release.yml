@@ -52,11 +52,17 @@ jobs:
       - name: Test
         run: go test -v ./...
       - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
-        name: create archive windows x86_x64
+        name: create archive windows amd64
         uses: vimtor/action-zip@v1.1
         with:
           files: helloworld-windows-amd64-${{ github.ref_name }}
           dest: helloworld-windows-amd64-${{ github.ref_name }}.zip
+      - if: matrix.os == 'windows-latest' || matrix.arch == 'arm64'
+        name: create archive windows arm64
+        uses: vimtor/action-zip@v1.1
+        with:
+          files: helloworld-windows-arm64-${{ github.ref_name }}
+          dest: helloworld-windows-arm64-${{ github.ref_name }}.zip
       - if: matrix.os == 'windows-latest' || matrix.arch == 'amd64'
         name: Upload Release Asset
         id: upload-release-asset_windows_amd64
